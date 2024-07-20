@@ -28,8 +28,8 @@ module.exports = {
     "import/prefer-default-export": "off",
     "import/no-unresolved": "off",
     "import/no-extraneous-dependencies": "off",
-
-    "import/extensions": ["error", "never"],
+    "import/no-cycle": "off",
+    "import/extensions": "off",
 
     "no-empty-function": "off",
     "no-useless-constructor": "off",

@@ -5,8 +5,8 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { useContainer } from "class-validator";
 import { config as envConfig } from "dotenv";
 import { initializeTransactionalContext } from "typeorm-transactional";
-import { consola } from "consola";
 import { AppModule } from "./app.module";
+import { logger } from "./lib/logger";
 
 envConfig();
 
@@ -20,7 +20,7 @@ function setupSwagger(app: INestApplication<any>, prefix = "docs") {
 
   const document = SwaggerModule.createDocument(app, config);
 
-  consola.info(
+  logger.info(
     "Swagger running at: " +
       `http://localhost:${process.env.APP_PORT}/${prefix}`,
   );
@@ -51,7 +51,7 @@ async function bootstrap() {
 
   setupSwagger(app);
 
-  consola.info(
+  logger.info(
     "Server running at port: " +
       `http://localhost:${process.env.APP_PORT}/${appPrefix}`,
   );

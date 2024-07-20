@@ -7,7 +7,7 @@ export const databaseOptions: DataSourceOptions = {
   port: Number(process.env.DATABASE_PORT) || 3306,
   host: process.env.DATABASE_HOST,
   type: process.env.DATABASE_TYPE as "mysql",
-  username: process.env.DATABASE_USERNAME,
+  username: process.env.DATABASE_USER,
   password: process.env.DATABASE_PASSWORD,
   database: process.env.DATABASE_NAME,
   entities: ["dist/src/modules/**/*.entity{.ts,.js}"],
