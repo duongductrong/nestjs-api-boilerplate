@@ -36,4 +36,9 @@ export class UserEntity extends BaseEntity implements User {
   get fullName(): string {
     return `${this.firstName} ${this.lastName}`;
   }
+
+  constructor(partial: Partial<UserEntity>) {
+    super();
+    Object.assign(this, partial);
+  }
 }
