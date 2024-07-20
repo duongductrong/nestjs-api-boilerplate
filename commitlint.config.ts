@@ -1,7 +1,7 @@
 import { UserConfig } from "@commitlint/types";
 
 const config: UserConfig = {
-  extends: ["@commitlint/config-conventional"],
+  extends: ["@commitlint/config-conventional", "gitmoji"],
   rules: {
     "type-enum": [
       2,
@@ -17,9 +17,12 @@ const config: UserConfig = {
         "test",
         "revert",
         "perf",
+        "build",
+        "temp",
       ],
     ],
   },
+  "subject-case": [0],
 };
 
 export default config;
