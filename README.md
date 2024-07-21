@@ -26,6 +26,27 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## Features
+
+- [ ] Database ORM (TypeOrm)
+  - [ ] Mongoose
+  - [x] Mysql
+  - [ ] Postgresql
+- [ ] Validation
+  - [x] class-validator
+- [ ] Authentication
+  - [x] Json Web Token (JWT)
+  - [ ] Google
+- [ ] Role-Based Access-Control (RBAC)
+- [ ] Email
+- [ ] File uploads
+  - [ ] Cloudinary
+  - [ ] S3 cloud
+
+## Feature flag
+
+- [x] Session
+
 ## Installation
 
 ```bash
@@ -39,7 +60,7 @@ $ pnpm install
 $ pnpm run start
 
 # watch mode
-$ pnpm run start:dev
+$ pnpm run dev
 
 # production mode
 $ pnpm run start:prod
