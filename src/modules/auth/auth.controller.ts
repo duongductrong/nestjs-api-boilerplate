@@ -8,7 +8,7 @@ import {
 } from "@nestjs/common"
 import { ApiTags } from "@nestjs/swagger"
 import { AppVersion } from "@/app.enum"
-import { ApiBuilder } from "@/lib/api/api.builder"
+import { ApiBuilder } from "@/packages/api"
 import { AuthService } from "./auth.service"
 import { LoginDto } from "./dtos/login.dto"
 import { SignUpDto } from "./dtos/signup.dto"

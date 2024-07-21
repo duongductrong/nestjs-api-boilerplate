@@ -5,8 +5,8 @@ import {
   IsString,
   IsStrongPassword,
 } from "class-validator"
-import { IsUnique } from "@/lib/validator/unique.constraint"
 import { UserEntity } from "@/modules/user/entities/user.entity"
+import { IsUnique } from "@/packages/validator"
 import { AuthSignupPayload } from "../auth.service"
 
 export class SignUpDto implements AuthSignupPayload {

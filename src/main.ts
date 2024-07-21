@@ -11,8 +11,7 @@ import { config as envConfig } from "dotenv"
 import { initializeTransactionalContext } from "typeorm-transactional"
 import { AppModule } from "./app.module"
 import { logger } from "./lib/logger"
-import { ApiInterceptor } from "./lib/api/api.interceptor"
-import { ApiPipe } from "./lib/api/api.pipe"
+import { ApiInterceptor, ApiPipe } from "./packages/api"
 
 envConfig()
 

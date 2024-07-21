@@ -6,7 +6,8 @@ import { AppService } from "./app.service"
 import { DatabaseModule } from "./database.module"
 import { AuthModule } from "./modules/auth/auth.module"
 import { UserModule } from "./modules/user/user.module"
-import { ValidatorModule } from "./lib/validator/validator.module"
+import { ValidatorModule } from "./packages/validator/validator.module"
+import { SessionModule } from "./modules/session/session.module"
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { ValidatorModule } from "./lib/validator/validator.module"
     ConfigModule,
     DatabaseModule,
     AuthModule,
+    SessionModule,
     UserModule,
   ],
   controllers: [AppController],

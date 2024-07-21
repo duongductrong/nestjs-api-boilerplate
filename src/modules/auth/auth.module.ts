@@ -6,11 +6,15 @@ import { UserEntity } from "../user/entities/user.entity"
 import { UserModule } from "../user/user.module"
 import { AuthController } from "./auth.controller"
 import { AuthService } from "./auth.service"
+import { SessionModule } from "../session/session.module"
 
 config({})
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([UserEntity]),
+    SessionModule,
+    UserModule,
     JwtModule.registerAsync({
       inject: [],
       imports: [],
@@ -25,8 +29,6 @@ config({})
         }
       },
     }),
-    TypeOrmModule.forFeature([UserEntity]),
-    UserModule,
   ],
   controllers: [AuthController],
   providers: [AuthService],
