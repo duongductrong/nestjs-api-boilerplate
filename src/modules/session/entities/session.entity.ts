@@ -7,7 +7,7 @@ import { UserEntity } from "@/modules/user/entities/user.entity"
   name: "sessions",
 })
 export class SessionEntity extends BaseEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn("uuid")
   id: string
 
   @Column()

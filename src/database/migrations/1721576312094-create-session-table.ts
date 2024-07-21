@@ -1,14 +1,17 @@
 import { MigrationInterface, QueryRunner } from "typeorm"
 
-export class CreateUserTable1721490327615 implements MigrationInterface {
-  name = "CreateUserTable1721490327615"
+export class CreateSessionTable1721576312094 implements MigrationInterface {
+  name = "CreateSessionTable1721576312094"
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
             CREATE TABLE \`sessions\` (
-                \`id\` int NOT NULL AUTO_INCREMENT,
+                \`created_at\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+                \`updated_at\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+                \`id\` varchar(36) NOT NULL,
                 \`token\` varchar(255) NOT NULL,
                 \`browser_name\` varchar(255) NULL,
+                \`host\` varchar(255) NULL,
                 \`metadata\` json NULL,
                 \`userId\` int NULL,
                 PRIMARY KEY (\`id\`)
