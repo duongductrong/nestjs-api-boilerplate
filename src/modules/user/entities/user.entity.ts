@@ -1,44 +1,38 @@
-import { Exclude, Expose } from "class-transformer";
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from "typeorm";
-import { User } from "../schema/user.schema";
-import { SessionEntity } from "./session.entity";
+import { Exclude, Expose } from "class-transformer"
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm"
+import { BaseEntity } from "@/lib/entity"
+import { SessionEntity } from "./session.entity"
 
 @Entity({
   name: "users",
 })
-export class UserEntity extends BaseEntity implements User {
+export class UserEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number
 
   @Column({ name: "fist_name", nullable: true })
-  firstName?: string;
+  firstName?: string
 
   @Column({ name: "last_name", nullable: true })
-  lastName?: string;
+  lastName?: string
 
   @Column({ unique: true })
-  email: string;
+  email: string
 
   @Column()
   @Exclude()
-  password: string;
+  password: string
 
   @OneToMany(() => SessionEntity, (session) => session.user)
-  sessions: SessionEntity[];
+  sessions: SessionEntity[]
 
   @Expose()
   get fullName(): string {
-    return `${this.firstName} ${this.lastName}`;
+    return `${this.firstName} ${this.lastName}`
   }
 
   constructor(partial: Partial<UserEntity>) {
-    super();
-    Object.assign(this, partial);
+    super()
+    Object.assign(this, partial)
   }
 }

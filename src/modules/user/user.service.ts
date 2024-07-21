@@ -1,34 +1,36 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
+import { Injectable } from "@nestjs/common"
+import { InjectRepository } from "@nestjs/typeorm"
 import {
+  DeepPartial,
   DeleteResult,
   FindManyOptions,
   FindOneOptions,
   FindOptionsWhere,
   ObjectId,
   Repository,
-} from "typeorm";
-import { BaseService, FindAllWithPaginatedOptions } from "@/lib/service";
-import { UserEntity } from "./entities/user.entity";
+} from "typeorm"
+import { BaseResourceService, FindAllWithPaginatedOptions } from "@/lib/service"
+import { UserEntity } from "./entities/user.entity"
+import { User } from "./schema/user.schema"
 
 @Injectable()
-export class UserService extends BaseService<UserEntity> {
+export class UserService extends BaseResourceService<UserEntity, User> {
   @InjectRepository(UserEntity)
-  private readonly userRepository: Repository<UserEntity>;
+  private readonly userRepository: Repository<UserEntity>
 
   findAll(criteria?: FindManyOptions<UserEntity>): Promise<UserEntity[]> {
-    return this.userRepository.find(criteria);
+    return this.userRepository.find(criteria)
   }
 
   findAllWithPaginated(
     options: FindAllWithPaginatedOptions,
   ): Promise<[UserEntity[], number]> {
-    const { page, limit, ...findOptions } = options;
+    const { page, limit, ...findOptions } = options
     return this.userRepository.findAndCount({
       skip: page * limit,
       take: limit,
       ...findOptions,
-    });
+    })
   }
 
   findOne(
@@ -41,30 +43,36 @@ export class UserService extends BaseService<UserEntity> {
         id: criteria as number,
         ...options.where,
       },
-    });
+    })
   }
 
-  create(
-    payloads: UserEntity | UserEntity[],
-  ): Promise<UserEntity | UserEntity[]> {
+  findOneByEmail(criteria: string) {
+    return this.userRepository.findOne({ where: { email: criteria } })
+  }
+
+  async create<P = DeepPartial<UserEntity | UserEntity[]>>(
+    payloads: P,
+  ): Promise<P extends UserEntity[] ? UserEntity[] : UserEntity> {
     const entities = this.toArrayEntities(payloads).map((item) =>
       this.userRepository.create(item as Partial<UserEntity>),
-    );
+    )
 
-    return this.userRepository.save(entities);
+    const result = await this.userRepository.save(entities)
+
+    return Array.isArray(payloads) ? result : (result[0] as any)
   }
 
   async update(
     criteria: string | number | Date | ObjectId,
     payloads: UserEntity,
   ): Promise<UserEntity> {
-    const result = await this.userRepository.update(criteria, payloads);
+    const result = await this.userRepository.update(criteria, payloads)
 
     if (result.affected <= 0) {
-      throw new Error("Update failed");
+      throw new Error("Update failed")
     }
 
-    return this.findOne(criteria);
+    return this.findOne(criteria)
   }
 
   delete(
@@ -79,6 +87,6 @@ export class UserService extends BaseService<UserEntity> {
       | ObjectId[]
       | FindOptionsWhere<UserEntity>,
   ): Promise<DeleteResult> {
-    return this.userRepository.delete(criteria);
+    return this.userRepository.delete(criteria)
   }
 }

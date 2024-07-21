@@ -1,34 +1,28 @@
-import { Exclude } from "class-transformer";
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from "typeorm";
-import { Session } from "../schema/session.schema";
-import { UserEntity } from "./user.entity";
+import { Exclude } from "class-transformer"
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
+import { BaseEntity } from "@/lib/entity"
+import { UserEntity } from "./user.entity"
 
 @Entity({
   name: "sessions",
 })
-export class SessionEntity extends BaseEntity implements Session {
+export class SessionEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: string
 
   @Column()
   @Exclude()
-  token: string;
+  token: string
 
   @Column({ name: "browser_name", nullable: true })
-  browserName?: string;
+  browserName?: string
 
   @Column({ nullable: true })
-  host?: string;
+  host?: string
 
   @Column({ type: "json", nullable: true })
-  metadata?: object;
+  metadata?: object
 
   @ManyToOne(() => UserEntity, (user) => user.sessions)
-  user: UserEntity;
+  user: UserEntity
 }

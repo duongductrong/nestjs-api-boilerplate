@@ -39,8 +39,9 @@ module.exports = {
       "error",
       {
         singleQuote: false,
+        semi: false,
         printWidth: 80,
       },
     ],
   },
-};
+}

@@ -1,36 +1,38 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
+  DeepPartial,
   DeleteResult,
   FindManyOptions,
   FindOneOptions,
-  FindOptions,
   FindOptionsWhere,
   ObjectId,
-} from "typeorm";
+} from "typeorm"
 
 export interface FindAllWithPaginatedOptions {
-  page: number;
-  limit: number;
+  page: number
+  limit: number
 }
 
-export abstract class BaseService<Entity> {
-  abstract findAll(criteria?: FindManyOptions<Entity>): Promise<Entity[]>;
+export abstract class BaseResourceService<Entity, Schema> {
+  abstract findAll(criteria?: FindManyOptions<Entity>): Promise<Entity[]>
 
   abstract findAllWithPaginated(
     options: FindAllWithPaginatedOptions,
-  ): Promise<[Entity[], number]>;
+  ): Promise<[Entity[], number]>
 
   abstract findOne(
     criteria: string | number | Date | ObjectId,
     options?: FindOneOptions<Entity>,
-  ): Promise<Entity>;
+  ): Promise<Entity>
 
-  abstract create(payloads: Entity | Entity[]): Promise<Entity | Entity[]>;
+  abstract create<P = DeepPartial<Entity | Entity[]>>(
+    payloads: P,
+  ): Promise<P extends Array<Entity> ? Entity[] : Entity>
 
   abstract update(
     criteria: string | number | Date | ObjectId,
     payloads: Entity,
-  ): Promise<Entity>;
+  ): Promise<Entity>
 
   abstract delete(
     criteria:
@@ -43,9 +45,11 @@ export abstract class BaseService<Entity> {
       | Date[]
       | ObjectId[]
       | FindOptionsWhere<Entity>,
-  ): Promise<DeleteResult>;
+  ): Promise<DeleteResult>
 
-  protected toArrayEntities(payloads: Entity | Entity[]) {
-    return Array.isArray(payloads) ? payloads : [payloads];
+  protected toArrayEntities(
+    payloads: DeepPartial<Schema> | DeepPartial<Schema>[],
+  ) {
+    return Array.isArray(payloads) ? payloads : [payloads]
   }
 }
