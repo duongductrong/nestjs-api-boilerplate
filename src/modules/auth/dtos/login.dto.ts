@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger"
-import { IsEmail, IsString, IsStrongPassword } from "class-validator"
+import { IsEmail, IsString } from "class-validator"
 import { AuthCredentials } from "../auth.service"
 
 export class LoginDto implements AuthCredentials {
@@ -9,7 +9,6 @@ export class LoginDto implements AuthCredentials {
   identify: string
 
   @IsString()
-  @IsStrongPassword()
   @ApiProperty({ example: "your_password" })
   password: string
 }
