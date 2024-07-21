@@ -1,17 +1,53 @@
 import {
   CanActivate,
   ExecutionContext,
+  Inject,
   Injectable,
   UnauthorizedException,
 } from "@nestjs/common"
+import { JwtService } from "@nestjs/jwt"
 import { Request } from "express"
-import { Observable } from "rxjs"
+import { set } from "lodash"
+import { SessionEntity } from "../session/entities/session.entity"
+import { SessionService } from "../session/session.service"
+import { UserService } from "../user/user.service"
+import { AuthJwtSignPayload } from "./auth.service"
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  @Inject() private readonly jwtService: JwtService
+
+  @Inject() private readonly userService: UserService
+
+  @Inject() private readonly sessionService: SessionService
+
+  async verifyingToken(token: string, request: Request) {
+    const verified =
+      await this.jwtService.verifyAsync<AuthJwtSignPayload>(token)
+
+    let session: SessionEntity | null = null
+    const user = await this.userService.findOneByEmail(verified.email)
+
+    // Check user is exist
+    if (!user) throw new UnauthorizedException("Unauthorized")
+
+    // Check session is enabled & exist
+    if (this.sessionService.isEnabled()) {
+      session = await this.sessionService.getSessionByUser(user)
+
+      // Set session to request
+      set(request, "local.session", session)
+
+      if (!session) throw new UnauthorizedException("Unauthorized")
+    }
+
+    // Set user to request
+    set(request, "local.user", user)
+
+    return { user, session }
+  }
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     try {
       const httpContext = context.switchToHttp()
       const req = httpContext.getRequest<Request>()
@@ -21,11 +57,11 @@ export class AuthGuard implements CanActivate {
         throw new UnauthorizedException("Unauthorized")
       }
 
-      // Verify token
+      await this.verifyingToken(token, req)
 
       return true
     } catch (error) {
-      throw new UnauthorizedException(error?.message || "Unauthorized")
+      throw new UnauthorizedException("Token is invalid or expired")
     }
   }
 }

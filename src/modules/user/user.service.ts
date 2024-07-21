@@ -45,7 +45,7 @@ export class UserService extends BaseResourceService<UserEntity> {
     })
   }
 
-  findOneByEmail(criteria: string) {
+  findOneByEmail(criteria: string): Promise<UserEntity | null> {
     return this.userRepository.findOne({ where: { email: criteria } })
   }
 

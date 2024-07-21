@@ -3,9 +3,9 @@ import { JwtService } from "@nestjs/jwt"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { token } from "@/lib/token"
+import { SessionService } from "../session/session.service"
 import { UserEntity } from "../user/entities/user.entity"
 import { UserService } from "../user/user.service"
-import { SessionService } from "../session/session.service"
 
 export interface AuthCredentials {
   identify: string
@@ -17,6 +17,11 @@ export interface AuthCredentials {
 export interface AuthValidatedResult {
   isValid: boolean
   data: UserEntity
+}
+
+export interface AuthJwtSignPayload {
+  email: UserEntity["email"]
+  sub: UserEntity["id"]
 }
 
 export interface AuthSignupPayload
@@ -72,11 +77,13 @@ export class AuthService implements AuthServiceInterface {
       sub: validated.data.id,
     })
 
-    await this.sessionService.createSession({
-      token: accessToken,
-      user: validated.data,
-      userAgent: credentials.metadata?.userAgent,
-    })
+    if (this.sessionService.isEnabled()) {
+      await this.sessionService.createSession({
+        token: accessToken,
+        user: validated.data,
+        userAgent: credentials.metadata?.userAgent,
+      })
+    }
 
     return accessToken
   }
@@ -113,15 +120,15 @@ export class AuthService implements AuthServiceInterface {
   //   // Resend email verification
   // }
 
-  async changePassword() {
-    // Change user password
-  }
+  // async changePassword() {
+  //   // Change user password
+  // }
 
-  async changeEmail() {
-    // Change user email
-  }
+  // async changeEmail() {
+  //   // Change user email
+  // }
 
-  async changeUsername() {
-    // Change user username
-  }
+  // async changeUsername() {
+  //   // Change user username
+  // }
 }
