@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Headers,
   Inject,
   InternalServerErrorException,
   Post,
@@ -23,9 +24,14 @@ export class AuthController {
   private readonly authService: AuthService
 
   @Post("login")
-  async login(@Body() credentials: LoginDto) {
+  async login(@Body() credentials: LoginDto, @Headers() headers: any) {
+    const userAgent = headers["user-agent"]
     try {
-      const result = await this.authService.login(credentials)
+      const result = await this.authService.login({
+        identify: credentials.identify,
+        password: credentials.password,
+        metadata: { userAgent },
+      })
 
       return ApiBuilder.create()
         .setData({

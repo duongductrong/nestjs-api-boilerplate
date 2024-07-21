@@ -5,10 +5,13 @@ import { Repository } from "typeorm"
 import { token } from "@/lib/token"
 import { UserEntity } from "../user/entities/user.entity"
 import { UserService } from "../user/user.service"
+import { SessionService } from "../session/session.service"
 
 export interface AuthCredentials {
   identify: string
   password: string
+
+  metadata?: Record<"userAgent", any>
 }
 
 export interface AuthValidatedResult {
@@ -44,6 +47,9 @@ export class AuthService implements AuthServiceInterface {
   @Inject()
   private readonly jwtService: JwtService
 
+  @Inject()
+  private readonly sessionService: SessionService
+
   async validate(credentials: AuthCredentials): Promise<AuthValidatedResult> {
     const user = await this.userService.findOneByEmail(credentials.identify)
 
@@ -64,6 +70,12 @@ export class AuthService implements AuthServiceInterface {
     const accessToken = await this.jwtService.sign({
       email: credentials.identify,
       sub: validated.data.id,
+    })
+
+    await this.sessionService.createSession({
+      token: accessToken,
+      user: validated.data,
+      userAgent: credentials.metadata?.userAgent,
     })
 
     return accessToken

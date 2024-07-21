@@ -14,11 +14,8 @@ export class SessionEntity extends BaseEntity {
   @Exclude()
   token: string
 
-  @Column({ name: "browser_name", nullable: true })
-  browserName?: string
-
-  @Column({ nullable: true })
-  host?: string
+  @Column({ name: "user_agent", nullable: true })
+  userAgent?: string
 
   @Column({ type: "json", nullable: true })
   metadata?: object

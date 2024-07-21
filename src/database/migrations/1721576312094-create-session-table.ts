@@ -10,8 +10,7 @@ export class CreateSessionTable1721576312094 implements MigrationInterface {
                 \`updated_at\` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
                 \`id\` varchar(36) NOT NULL,
                 \`token\` varchar(255) NOT NULL,
-                \`browser_name\` varchar(255) NULL,
-                \`host\` varchar(255) NULL,
+                \`user_agent\` varchar(255) NULL,
                 \`metadata\` json NULL,
                 \`userId\` int NULL,
                 PRIMARY KEY (\`id\`)
