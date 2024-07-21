@@ -13,7 +13,7 @@ export interface FindAllWithPaginatedOptions {
   limit: number
 }
 
-export abstract class BaseResourceService<Entity, Schema> {
+export abstract class BaseResourceService<Entity> {
   abstract findAll(criteria?: FindManyOptions<Entity>): Promise<Entity[]>
 
   abstract findAllWithPaginated(
@@ -48,7 +48,7 @@ export abstract class BaseResourceService<Entity, Schema> {
   ): Promise<DeleteResult>
 
   protected toArrayEntities(
-    payloads: DeepPartial<Schema> | DeepPartial<Schema>[],
+    payloads: DeepPartial<Entity> | DeepPartial<Entity>[],
   ) {
     return Array.isArray(payloads) ? payloads : [payloads]
   }

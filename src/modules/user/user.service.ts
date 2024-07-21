@@ -11,10 +11,9 @@ import {
 } from "typeorm"
 import { BaseResourceService, FindAllWithPaginatedOptions } from "@/lib/service"
 import { UserEntity } from "./entities/user.entity"
-import { User } from "./schema/user.schema"
 
 @Injectable()
-export class UserService extends BaseResourceService<UserEntity, User> {
+export class UserService extends BaseResourceService<UserEntity> {
   @InjectRepository(UserEntity)
   private readonly userRepository: Repository<UserEntity>
 
