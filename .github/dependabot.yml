@@ -7,7 +7,7 @@ updates:
       interval: "daily"
     groups:
       minor-and-patch-updates:
-        pattern:
+        patterns:
           - "*"
         update-types:
           - "minor"
