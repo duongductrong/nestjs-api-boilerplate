@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
 import { InjectRepository } from "@nestjs/typeorm"
-import { FindOneOptions, Repository } from "typeorm"
+import { FindOneOptions, LessThan, Repository } from "typeorm"
 import { FeatureFlagScope } from "../feature-flag/feature-flag.enum"
 import { FeatureFlagService } from "../feature-flag/feature-flag.service"
 import { SessionEntity } from "./entities/session.entity"
@@ -94,5 +94,9 @@ export class SessionService {
       .execute()
 
     return !!ok?.affected
+  }
+
+  cleanup() {
+    this.sessionRepository.delete({ expiresAt: LessThan(new Date()) })
   }
 }

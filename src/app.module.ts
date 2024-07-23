@@ -1,6 +1,7 @@
 import { ClassSerializerInterceptor, Module } from "@nestjs/common"
 import { ConfigModule } from "@nestjs/config"
 import { APP_INTERCEPTOR } from "@nestjs/core"
+import { ScheduleModule } from "@nestjs/schedule"
 import { AppController } from "./app.controller"
 import { AppService } from "./app.service"
 import { DatabaseModule } from "./database.module"
@@ -23,6 +24,7 @@ import { ValidatorModule } from "./packages/validator/validator.module"
       ],
       isGlobal: true,
     }),
+    ScheduleModule.forRoot(),
     FeatureFlagModule,
     ValidatorModule,
     DatabaseModule,
