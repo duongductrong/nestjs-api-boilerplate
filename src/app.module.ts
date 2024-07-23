@@ -31,7 +31,6 @@ import { ValidatorModule } from "./packages/validator/validator.module"
     AuthModule,
     SessionModule,
     UserModule,
-    FeatureFlagModule,
   ],
   controllers: [AppController],
   providers: [
