@@ -29,6 +29,7 @@
     "database:seed": "npm run build && npm run seeding -- seed -d ./dist/datasource.js ./dist/src/database/seeds/*.js"
   },
   "dependencies": {
+    "@casl/ability": "^6.7.1",
     "@faker-js/faker": "^8.4.1",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.3",
