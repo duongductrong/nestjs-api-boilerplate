@@ -8,6 +8,7 @@ import {
 import { JwtService } from "@nestjs/jwt"
 import { Request } from "express"
 import { set } from "lodash"
+import { logger } from "@/lib/logger"
 import { SessionEntity } from "../session/entities/session.entity"
 import { SessionService } from "../session/session.service"
 import { UserService } from "../user/user.service"
@@ -26,7 +27,7 @@ export class AuthGuard implements CanActivate {
       await this.jwtService.verifyAsync<AuthJwtSignPayload>(token)
 
     let session: SessionEntity | null = null
-    const user = await this.userService.findOneByEmail(verified.email)
+    const user = await this.userService.findOne(verified.sub)
 
     // Check user is exist
     if (!user) throw new UnauthorizedException("Unauthorized")
@@ -35,10 +36,10 @@ export class AuthGuard implements CanActivate {
     if (this.sessionService.isEnabled()) {
       session = await this.sessionService.getSessionByUser(user)
 
+      if (!session) throw new UnauthorizedException("Unauthorized")
+
       // Set session to request
       set(request, "local.session", session)
-
-      if (!session) throw new UnauthorizedException("Unauthorized")
     }
 
     // Set user to request
@@ -61,6 +62,7 @@ export class AuthGuard implements CanActivate {
 
       return true
     } catch (error) {
+      logger.error(error)
       throw new UnauthorizedException("Token is invalid or expired")
     }
   }

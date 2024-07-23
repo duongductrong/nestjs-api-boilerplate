@@ -13,6 +13,7 @@ export class CreateSessionTable1721576312094 implements MigrationInterface {
                 \`user_agent\` varchar(255) NULL,
                 \`metadata\` json NULL,
                 \`userId\` int NULL,
+                \`expires_at\` timestamp NULL,
                 PRIMARY KEY (\`id\`)
             ) ENGINE = InnoDB
         `)

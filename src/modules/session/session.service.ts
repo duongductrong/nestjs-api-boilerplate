@@ -7,7 +7,10 @@ import { FeatureFlagService } from "../feature-flag/feature-flag.service"
 import { SessionEntity } from "./entities/session.entity"
 
 export interface CreateSessionPayload
-  extends Pick<SessionEntity, "userAgent" | "token" | "user" | "metadata"> {}
+  extends Pick<
+    SessionEntity,
+    "userAgent" | "token" | "user" | "metadata" | "expiresAt"
+  > {}
 
 @Injectable()
 export class SessionService {

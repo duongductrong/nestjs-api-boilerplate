@@ -1,5 +1,11 @@
 import { Exclude } from "class-transformer"
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from "typeorm"
 import { BaseEntity } from "@/lib/entity"
 import { UserEntity } from "@/modules/user/entities/user.entity"
 
@@ -21,5 +27,14 @@ export class SessionEntity extends BaseEntity {
   metadata?: object
 
   @ManyToOne(() => UserEntity, (user) => user.sessions)
+  @JoinColumn({ name: "user_id" })
   user: UserEntity
+
+  @Column({
+    type: "timestamp",
+    name: "expires_at",
+    default: null,
+    nullable: true,
+  })
+  expiresAt?: Date
 }

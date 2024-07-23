@@ -40,7 +40,7 @@ export class UserService extends BaseResourceService<UserEntity> {
       ...options,
       where: {
         id: criteria as number,
-        ...options.where,
+        ...options?.where,
       },
     })
   }

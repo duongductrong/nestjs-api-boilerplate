@@ -8,6 +8,7 @@ import { JwtService } from "@nestjs/jwt"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { token } from "@/lib/token"
+import { dayjs } from "@/lib/dayjs"
 import { SessionService } from "../session/session.service"
 import { UserEntity } from "../user/entities/user.entity"
 import { UserService } from "../user/user.service"
@@ -77,16 +78,22 @@ export class AuthService implements AuthServiceInterface {
     if (!validated.isValid)
       throw new UnauthorizedException("Invalid credentials")
 
-    const accessToken = await this.jwtService.sign({
-      email: credentials.identify,
-      sub: validated.data.id,
-    })
+    const expiresIn = dayjs().add(1, "hour")
+
+    const accessToken = await this.jwtService.sign(
+      {
+        email: credentials.identify,
+        sub: validated.data.id,
+      },
+      { expiresIn: expiresIn.unix() },
+    )
 
     if (this.sessionService.isEnabled()) {
       await this.sessionService.createSession({
         token: accessToken,
         user: validated.data,
         userAgent: credentials.metadata?.userAgent,
+        expiresAt: expiresIn.toDate(),
       })
     }
 
