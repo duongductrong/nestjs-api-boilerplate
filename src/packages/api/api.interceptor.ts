@@ -50,7 +50,9 @@ export class ApiInterceptor implements NestInterceptor {
       ? exception.cause
       : (exception?.getResponse?.() as any)?.signalValidationPipe
         ? (exception?.getResponse?.() as any).errors
-        : exception?.getResponse?.()
+        : exception instanceof HttpException
+          ? null
+          : null
 
     return response.status(status).json({
       data: result,
