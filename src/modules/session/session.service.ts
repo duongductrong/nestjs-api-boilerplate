@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Repository } from "typeorm"
+import { FindOneOptions, Repository } from "typeorm"
 import { FeatureFlagScope } from "../feature-flag/feature-flag.enum"
 import { FeatureFlagService } from "../feature-flag/feature-flag.service"
 import { SessionEntity } from "./entities/session.entity"
@@ -53,11 +53,15 @@ export class SessionService {
 
   async getSessionByUser(
     user: SessionEntity["user"] | SessionEntity["user"]["id"],
+    options?: FindOneOptions<SessionEntity>,
   ): Promise<SessionEntity | null> {
     this.checkEnabledOrThrow()
 
     const userId = typeof user === "object" ? user.id : user
-    return this.sessionRepository.findOne({ where: { user: { id: userId } } })
+    return this.sessionRepository.findOne({
+      ...options,
+      where: { ...options?.where, user: { id: userId } },
+    })
   }
 
   async createSession(payload: CreateSessionPayload): Promise<SessionEntity> {

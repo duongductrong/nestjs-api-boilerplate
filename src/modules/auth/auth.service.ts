@@ -4,9 +4,11 @@ import {
   Injectable,
   UnauthorizedException,
 } from "@nestjs/common"
+import { ConfigService } from "@nestjs/config"
 import { JwtService } from "@nestjs/jwt"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Repository } from "typeorm"
+import { Dayjs } from "dayjs"
+import { MoreThan, Repository } from "typeorm"
 import { token } from "@/lib/token"
 import { dayjs } from "@/lib/dayjs"
 import { SessionService } from "../session/session.service"
@@ -61,6 +63,64 @@ export class AuthService implements AuthServiceInterface {
   @Inject()
   private readonly sessionService: SessionService
 
+  @Inject()
+  private readonly configService: ConfigService
+
+  /**
+   * Generates a token for the given credentials and user.
+   * If session service is enabled, it checks if there is an active session for the user.
+   * If an active session exists, it returns the session token.
+   * Otherwise, it generates a new access token using the JWT service.
+   *
+   * @param credentials - The authentication credentials.
+   * @param user - The user entity.
+   * @param expiresIn - The expiration time for the token.
+   * @returns A promise that resolves to the generated token.
+   */
+  private async makeToken(
+    credentials: AuthCredentials,
+    user: UserEntity,
+    expiresIn: Dayjs,
+  ): Promise<string> {
+    const isEnabledSessionFeature = this.sessionService.isEnabled()
+
+    if (isEnabledSessionFeature) {
+      const currentSession = await this.sessionService.getSessionByUser(user, {
+        where: { expiresAt: MoreThan(dayjs().toDate()) },
+      })
+
+      if (currentSession) {
+        return currentSession.token
+      }
+    }
+
+    const accessToken = await this.jwtService.sign(
+      {
+        email: credentials.identify,
+        sub: user.id,
+      },
+      { expiresIn: expiresIn.unix() },
+    )
+
+    if (isEnabledSessionFeature) {
+      await this.sessionService.createSession({
+        user,
+        token: accessToken,
+        userAgent: credentials.metadata?.userAgent,
+        expiresAt: expiresIn.toDate(),
+      })
+    }
+
+    return accessToken
+  }
+
+  /**
+   * Validates the given credentials.
+   *
+   * @param credentials - The authentication credentials to validate.
+   * @returns A promise that resolves to an `AuthValidatedResult` object.
+   * @throws Error if the user is not found.
+   */
   async validate(credentials: AuthCredentials): Promise<AuthValidatedResult> {
     const user = await this.userService.findOneByEmail(credentials.identify)
 
@@ -73,29 +133,17 @@ export class AuthService implements AuthServiceInterface {
   }
 
   async login(credentials: AuthCredentials): Promise<string> {
+    const jwtExpiresIn = Number(this.configService.get("JWT_EXPIRES_IN"))
+
     const validated = await this.validate(credentials)
 
     if (!validated.isValid)
       throw new UnauthorizedException("Invalid credentials")
 
-    const expiresIn = dayjs().add(1, "hour")
+    const user = validated.data
+    const expiresIn = dayjs().add(Number(jwtExpiresIn), "hour")
 
-    const accessToken = await this.jwtService.sign(
-      {
-        email: credentials.identify,
-        sub: validated.data.id,
-      },
-      { expiresIn: expiresIn.unix() },
-    )
-
-    if (this.sessionService.isEnabled()) {
-      await this.sessionService.createSession({
-        token: accessToken,
-        user: validated.data,
-        userAgent: credentials.metadata?.userAgent,
-        expiresAt: expiresIn.toDate(),
-      })
-    }
+    const accessToken = await this.makeToken(credentials, user, expiresIn)
 
     return accessToken
   }
