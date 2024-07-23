@@ -1,4 +1,9 @@
-import { Inject, Injectable, UnauthorizedException } from "@nestjs/common"
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from "@nestjs/common"
 import { JwtService } from "@nestjs/jwt"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
@@ -100,8 +105,15 @@ export class AuthService implements AuthServiceInterface {
   }
 
   async signOut(accessToken: string): Promise<boolean> {
-    console.log(accessToken)
-    return true
+    const deletedSession = await this.sessionService.deleteSession(accessToken)
+
+    if (!deletedSession) {
+      throw new BadRequestException(
+        "Can't sign out user cause session not found.",
+      )
+    }
+
+    return deletedSession
   }
 
   // async forgotPassword() {

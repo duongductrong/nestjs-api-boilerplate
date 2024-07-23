@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Headers,
@@ -10,6 +11,7 @@ import {
 import { ApiTags } from "@nestjs/swagger"
 import { AppVersion } from "@/app.enum"
 import { ApiBuilder } from "@/packages/api"
+import { Auth, Token } from "./auth.decorator"
 import { AuthService } from "./auth.service"
 import { LoginDto } from "./dtos/login.dto"
 import { SignUpDto } from "./dtos/signup.dto"
@@ -57,6 +59,21 @@ export class AuthController {
       throw new InternalServerErrorException(
         error?.message || "Something went wrong",
       )
+    }
+  }
+
+  @Auth()
+  @Post("logout")
+  async logout(@Token() token: string) {
+    try {
+      await this.authService.signOut(token)
+
+      return ApiBuilder.create()
+        .setData({})
+        .setMessage("Logout successful")
+        .build()
+    } catch (e) {
+      throw new BadRequestException(e?.message)
     }
   }
 }

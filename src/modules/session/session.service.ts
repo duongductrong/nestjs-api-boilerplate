@@ -79,13 +79,13 @@ export class SessionService {
     const criteria = session instanceof SessionEntity ? session.id : session
 
     const ok = await this.sessionRepository
-      .createQueryBuilder("session")
+      .createQueryBuilder("sessions")
       .delete()
       .from(SessionEntity)
-      .where("session.token = :token", { token: criteria })
-      .orWhere("session.id = :id", { id: criteria })
+      .where("sessions.token = :token", { token: criteria })
+      .orWhere("sessions.id = :id", { id: criteria })
       .execute()
 
-    return !!ok.affected
+    return !!ok?.affected
   }
 }
