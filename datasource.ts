@@ -1,7 +1,8 @@
-import { config } from "dotenv";
-import { DataSource, DataSourceOptions } from "typeorm";
+/* eslint-disable eqeqeq */
+import { config } from "dotenv"
+import { DataSource, DataSourceOptions } from "typeorm"
 
-config();
+config()
 
 export const databaseOptions: DataSourceOptions = {
   port: Number(process.env.DATABASE_PORT) || 3306,
@@ -13,10 +14,10 @@ export const databaseOptions: DataSourceOptions = {
   entities: ["dist/src/modules/**/*.entity{.ts,.js}"],
   migrations: ["dist/src/database/migrations/*{.ts,.js}"],
   subscribers: ["dist/src/modules/**/*.subscriber{.ts,.js}"],
-  synchronize: true,
+  synchronize: process.env.DATABASE_SYNC == "true",
   migrationsTableName: process.env.DATABASE_MIGRATION || "migrations",
-};
+}
 
-const dataSource = new DataSource(databaseOptions);
+const dataSource = new DataSource(databaseOptions)
 
-export default dataSource;
+export default dataSource
