@@ -11,6 +11,7 @@ import { FeatureFlagService } from "./modules/feature-flag/feature-flag.service"
 import { SessionModule } from "./modules/session/session.module"
 import { UserModule } from "./modules/user/user.module"
 import { ValidatorModule } from "./packages/validator/validator.module"
+import { RoleModule } from "./modules/role/role.module"
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { ValidatorModule } from "./packages/validator/validator.module"
     AuthModule,
     SessionModule,
     UserModule,
+    RoleModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,6 +1,14 @@
 import { Exclude, Expose } from "class-transformer"
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm"
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from "typeorm"
 import { BaseEntity } from "@/lib/entity"
+import { RoleEntity } from "@/modules/role/entities/role.entity"
 import { SessionEntity } from "@/modules/session/entities/session.entity"
 
 @Entity({
@@ -25,6 +33,10 @@ export class UserEntity extends BaseEntity {
 
   @OneToMany(() => SessionEntity, (session) => session.user)
   sessions: SessionEntity[]
+
+  @ManyToOne(() => RoleEntity, (role) => role.users)
+  @JoinColumn({ name: "role_id" })
+  role: RoleEntity
 
   @Expose()
   get fullName(): string {
