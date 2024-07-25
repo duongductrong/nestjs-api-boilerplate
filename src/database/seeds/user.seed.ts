@@ -8,6 +8,7 @@ import { token } from "@/lib/token"
 
 export default class UserSeeder extends Seeder {
   async run(dataSource: DataSource) {
+    return
     const pwd = await token.hash("123456")
 
     const users: Pick<
