@@ -1,4 +1,4 @@
-import { UserConfig } from "@commitlint/types";
+import { UserConfig } from "@commitlint/types"
 
 const config: UserConfig = {
   extends: ["@commitlint/config-conventional", "gitmoji"],
@@ -23,6 +23,6 @@ const config: UserConfig = {
     ],
   },
   "subject-case": [0],
-};
+}
 
-export default config;
+export default config
