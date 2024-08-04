@@ -31,6 +31,7 @@ module.exports = {
     "import/no-cycle": "off",
     "import/extensions": "off",
 
+    "no-shadow": "off",
     "no-empty-function": "off",
     "no-useless-constructor": "off",
     "class-methods-use-this": "off",
