@@ -9,6 +9,7 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger"
 import { useContainer } from "class-validator"
 import { config as envConfig } from "dotenv"
 import { initializeTransactionalContext } from "typeorm-transactional"
+import { I18nValidationPipe } from "nestjs-i18n"
 import { AppModule } from "./app.module"
 import { logger } from "./lib/logger"
 import { ApiInterceptor, ApiPipe } from "./packages/api"
@@ -54,7 +55,7 @@ async function bootstrap() {
     new ClassSerializerInterceptor(app.get(Reflector)),
   )
 
-  app.useGlobalPipes(ApiPipe.create())
+  app.useGlobalPipes(new I18nValidationPipe(), ApiPipe.create())
 
   // App versioning
   app.enableVersioning({
