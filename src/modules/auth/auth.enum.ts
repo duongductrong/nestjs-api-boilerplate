@@ -8,4 +8,5 @@ export enum AuthPath {
   Login = "login",
   Signup = "signup",
   Logout = "logout",
+  Refresh = "refresh",
 }

@@ -7,6 +7,7 @@ import {
   Inject,
   InternalServerErrorException,
   Post,
+  Put,
   UnauthorizedException,
 } from "@nestjs/common"
 import { ApiTags } from "@nestjs/swagger"
@@ -93,5 +94,17 @@ export class AuthController {
     } catch (e) {
       throw new BadRequestException(e?.message)
     }
+  }
+
+  @Put(AuthPath.Refresh)
+  async refresh(@Token() token: string) {
+    const result = await this.authService.refreshToken(token)
+
+    return ApiBuilder.create()
+      .setData({
+        accessToken: result,
+      })
+      .setMessage(this.translator.t("general.success.operation"))
+      .build()
   }
 }

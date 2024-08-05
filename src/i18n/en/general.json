@@ -16,6 +16,7 @@
 
     "tokenRequired": "Token is required",
     "tokenExpired": "Token is expired",
+    "tokenAlive": "Token is still alive",
 
     "sessionNotFound": "Session not found"
   },

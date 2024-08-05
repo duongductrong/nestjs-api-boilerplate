@@ -41,6 +41,7 @@ interface AuthServiceInterface {
   login(credentials: AuthCredentials): Promise<string>
   signUp(payload: AuthSignupPayload): Promise<UserEntity>
   signOut(accessToken: string): Promise<boolean>
+  refreshToken(accessToken: string): Promise<string>
   // forgotPassword(): Promise<void>;
   // resetPassword(): Promise<void>;
   // verifyEmail(): Promise<void>;
@@ -82,7 +83,7 @@ export class AuthService implements AuthServiceInterface {
    * @returns A promise that resolves to the generated token.
    */
   private async makeToken(
-    credentials: AuthCredentials,
+    credentials: Omit<AuthCredentials, "password">,
     user: UserEntity,
     expiresIn: Dayjs,
   ): Promise<string> {
@@ -118,6 +119,11 @@ export class AuthService implements AuthServiceInterface {
     return accessToken
   }
 
+  private getTokenExpiryDate(): Dayjs {
+    const jwtExpiresIn = Number(this.configService.get("JWT_EXPIRES_IN"))
+    return dayjs().add(jwtExpiresIn, "hour")
+  }
+
   /**
    * Validates the given credentials.
    *
@@ -138,8 +144,6 @@ export class AuthService implements AuthServiceInterface {
   }
 
   async login(credentials: AuthCredentials): Promise<string> {
-    const jwtExpiresIn = Number(this.configService.get("JWT_EXPIRES_IN"))
-
     const validated = await this.validate(credentials)
 
     if (!validated.isValid)
@@ -148,7 +152,7 @@ export class AuthService implements AuthServiceInterface {
       )
 
     const user = validated.data
-    const expiresIn = dayjs().add(Number(jwtExpiresIn), "hour")
+    const expiresIn = this.getTokenExpiryDate()
 
     const accessToken = await this.makeToken(credentials, user, expiresIn)
 
@@ -176,6 +180,50 @@ export class AuthService implements AuthServiceInterface {
     }
 
     return deletedSession
+  }
+
+  async refreshToken(accessToken: string): Promise<string> {
+    const payload = this.jwtService.decode<AuthJwtSignPayload>(accessToken)
+
+    if (!payload) {
+      throw new BadRequestException(
+        this.translatorService.t("general.error.invalidToken"),
+      )
+    }
+
+    const session = await this.sessionService.getSessionByToken(accessToken)
+
+    // If the session exists and the token is still alive, return the token
+    if (session && dayjs(session.expiresAt).toDate() > dayjs().toDate()) {
+      throw new BadRequestException(
+        this.translatorService.t("general.error.tokenAlive"),
+      )
+    }
+    // If the session exists and the token is expired, delete the session
+    if (session && dayjs(session.expiresAt).toDate() < dayjs().toDate()) {
+      this.sessionService.deleteSession(session)
+    }
+
+    const user = await this.userRepository.findOne({
+      where: { id: payload.sub, email: payload.email },
+    })
+
+    // If the user is not found, throw an error
+    if (!user) {
+      throw new BadRequestException(
+        this.translatorService.t("general.error.notFound"),
+      )
+    }
+
+    const expiresIn = this.getTokenExpiryDate()
+
+    const newAccessToken = await this.makeToken(
+      { identify: user.email },
+      user,
+      expiresIn,
+    )
+
+    return newAccessToken
   }
 
   // async forgotPassword() {

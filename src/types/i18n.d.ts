@@ -20,6 +20,7 @@ export type I18nTranslations = {
             "invalidToken": string;
             "tokenRequired": string;
             "tokenExpired": string;
+            "tokenAlive": string;
             "sessionNotFound": string;
         };
         "success": {
