@@ -5,8 +5,8 @@ import { SessionModule } from "../session/session.module"
 import { UserEntity } from "../user/entities/user.entity"
 import { UserModule } from "../user/user.module"
 import { AuthController } from "./auth.controller"
-import { AuthService } from "./auth.service"
 import { AuthScheduleService } from "./auth.schedule"
+import { AuthService } from "./auth.service"
 
 @Module({
   imports: [

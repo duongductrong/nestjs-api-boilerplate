@@ -8,6 +8,8 @@ import {
 import { JwtService } from "@nestjs/jwt"
 import { Request } from "express"
 import { set } from "lodash"
+import { I18nService } from "nestjs-i18n"
+import { I18nTranslations } from "@/types/i18n"
 import { logger } from "@/lib/logger"
 import { SessionEntity } from "../session/entities/session.entity"
 import { SessionService } from "../session/session.service"
@@ -22,6 +24,8 @@ export class AuthGuard implements CanActivate {
 
   @Inject() private readonly sessionService: SessionService
 
+  @Inject() private readonly translator: I18nService<I18nTranslations>
+
   async verifyingToken(token: string, request: Request) {
     const verified =
       await this.jwtService.verifyAsync<AuthJwtSignPayload>(token)
@@ -30,13 +34,19 @@ export class AuthGuard implements CanActivate {
     const user = await this.userService.findOne(verified.sub)
 
     // Check user is exist
-    if (!user) throw new UnauthorizedException("Unauthorized")
+    if (!user)
+      throw new UnauthorizedException(
+        this.translator.t("general.error.unauthorized"),
+      )
 
     // Check session is enabled & exist
     if (this.sessionService.isEnabled()) {
       session = await this.sessionService.getSessionByUser(user)
 
-      if (!session) throw new UnauthorizedException("Unauthorized")
+      if (!session)
+        throw new UnauthorizedException(
+          this.translator.t("general.error.unauthorized"),
+        )
 
       // Set session to request
       set(request, "local.session", session)
@@ -55,7 +65,9 @@ export class AuthGuard implements CanActivate {
       const [bearer, token] = req.headers.authorization.split(" ")
 
       if (bearer !== "Bearer" || !token) {
-        throw new UnauthorizedException("Unauthorized")
+        throw new UnauthorizedException(
+          this.translator.t("general.error.unauthorized"),
+        )
       }
 
       await this.verifyingToken(token, req)
@@ -63,7 +75,9 @@ export class AuthGuard implements CanActivate {
       return true
     } catch (error) {
       logger.error(error)
-      throw new UnauthorizedException("Token is invalid or expired")
+      throw new UnauthorizedException(
+        this.translator.t("general.error.invalidToken"),
+      )
     }
   }
 }

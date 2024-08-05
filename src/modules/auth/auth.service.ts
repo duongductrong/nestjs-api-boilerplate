@@ -10,6 +10,7 @@ import { InjectRepository } from "@nestjs/typeorm"
 import { Dayjs } from "dayjs"
 import { MoreThan, Repository } from "typeorm"
 import { token } from "@/lib/token"
+import { Translations, TranslatorService } from "@/lib/i18n"
 import { dayjs } from "@/lib/dayjs"
 import { SessionService } from "../session/session.service"
 import { UserEntity } from "../user/entities/user.entity"
@@ -65,6 +66,9 @@ export class AuthService implements AuthServiceInterface {
 
   @Inject()
   private readonly configService: ConfigService
+
+  @Inject()
+  private readonly translatorService: TranslatorService<Translations>
 
   /**
    * Generates a token for the given credentials and user.
@@ -124,7 +128,8 @@ export class AuthService implements AuthServiceInterface {
   async validate(credentials: AuthCredentials): Promise<AuthValidatedResult> {
     const user = await this.userService.findOneByEmail(credentials.identify)
 
-    if (!user) throw new Error("User not found")
+    if (!user)
+      throw new Error(this.translatorService.t("general.error.notFound"))
 
     return {
       isValid: await token.verify(credentials.password, user.password),
@@ -138,7 +143,9 @@ export class AuthService implements AuthServiceInterface {
     const validated = await this.validate(credentials)
 
     if (!validated.isValid)
-      throw new UnauthorizedException("Invalid credentials")
+      throw new UnauthorizedException(
+        this.translatorService.t("general.error.invalidCredentials"),
+      )
 
     const user = validated.data
     const expiresIn = dayjs().add(Number(jwtExpiresIn), "hour")
@@ -164,7 +171,7 @@ export class AuthService implements AuthServiceInterface {
 
     if (!deletedSession) {
       throw new BadRequestException(
-        "Can't sign out user cause session not found.",
+        this.translatorService.t("general.error.sessionNotFound"),
       )
     }
 

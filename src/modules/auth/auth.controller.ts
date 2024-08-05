@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   Headers,
   Inject,
   InternalServerErrorException,
@@ -9,23 +10,38 @@ import {
   UnauthorizedException,
 } from "@nestjs/common"
 import { ApiTags } from "@nestjs/swagger"
+import { I18n } from "nestjs-i18n"
 import { AppVersion } from "@/app.enum"
+import { Translations, TranslatorContext, TranslatorService } from "@/lib/i18n"
 import { ApiBuilder } from "@/packages/api"
-import { Auth, Token } from "./auth.decorator"
+import { UserEntity } from "../user/entities/user.entity"
+import { Auth, Token, User } from "./auth.decorator"
+import { AuthApi, AuthPath } from "./auth.enum"
 import { AuthService } from "./auth.service"
 import { LoginDto } from "./dtos/login.dto"
 import { SignUpDto } from "./dtos/signup.dto"
 
-@ApiTags("Auth")
+@ApiTags(AuthApi.Tags)
 @Controller({
-  path: "auth",
+  path: AuthApi.Path,
   version: AppVersion.v1,
 })
 export class AuthController {
   @Inject()
   private readonly authService: AuthService
 
-  @Post("login")
+  @Inject() private readonly translator: TranslatorService<Translations>
+
+  @Auth()
+  @Get(AuthPath.Me)
+  async me(@User() user: UserEntity, @I18n() translator: TranslatorContext) {
+    return ApiBuilder.create()
+      .setData(user)
+      .setMessage(translator.t("general.success.retrieved"))
+      .build()
+  }
+
+  @Post(AuthPath.Login)
   async login(@Body() credentials: LoginDto, @Headers() headers: any) {
     const userAgent = headers["user-agent"]
     try {
@@ -39,38 +55,40 @@ export class AuthController {
         .setData({
           accessToken: result,
         })
-        .setMessage("Login successful")
+        .setMessage(this.translator.t("general.success.operation"))
         .build()
     } catch (error) {
-      throw new UnauthorizedException(error?.message || "Invalid credentials")
+      throw new UnauthorizedException(
+        error?.message || this.translator.t("general.error.invalidCredentials"),
+      )
     }
   }
 
-  @Post("signup")
+  @Post(AuthPath.Signup)
   async signup(@Body() payload: SignUpDto) {
     try {
       const result = await this.authService.signUp(payload)
 
       return ApiBuilder.create()
         .setData(result)
-        .setMessage("Signup successful")
+        .setMessage(this.translator.t("general.success.operation"))
         .build()
     } catch (error) {
       throw new InternalServerErrorException(
-        error?.message || "Something went wrong",
+        error?.message || this.translator.t("general.error.somethingWentWrong"),
       )
     }
   }
 
   @Auth()
-  @Post("logout")
+  @Post(AuthPath.Logout)
   async logout(@Token() token: string) {
     try {
       await this.authService.signOut(token)
 
       return ApiBuilder.create()
         .setData({})
-        .setMessage("Logout successful")
+        .setMessage(this.translator.t("general.success.operation"))
         .build()
     } catch (e) {
       throw new BadRequestException(e?.message)
