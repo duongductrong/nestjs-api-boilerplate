@@ -31,20 +31,20 @@
 
 ## Features
 
-- [ ] Database ORM (TypeOrm)
-  - [ ] Mongoose
+- [x] Database ORM: TypeORM
+  - [x] Mongoose
   - [x] Mysql
-  - [ ] Postgresql
-- [ ] Validation
+  - [x] Postgresql
+- [x] Validation
   - [x] class-validator
 - [ ] Authentication
-  - [x] Json Web Token (JWT)
-  - [ ] Google
+  - [x] Refresh token
+  - [x] Sign in/up with email (JWT)
 - [ ] Role-Based Access-Control (RBAC)
 - [ ] Email
 - [ ] File uploads
   - [ ] Cloudinary
-  - [ ] S3 cloud
+  - [ ] AWS S3
 
 ## Feature flag
 
