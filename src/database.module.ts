@@ -9,7 +9,16 @@ import { DataSourceOptions } from "typeorm"
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory(configService: ConfigService) {
+        const databaseUrl = configService.get<string>("DATABASE_URL")
+
+        if (!databaseUrl) {
+          return {
+            url: databaseUrl,
+          }
+        }
+
         return {
+          url: configService.get<string>("DATABASE_URL"),
           type: configService.get<DataSourceOptions["type"]>(
             "DATABASE_TYPE",
           ) as "postgres",

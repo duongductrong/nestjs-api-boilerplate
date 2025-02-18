@@ -5,9 +5,10 @@ import { DataSource, DataSourceOptions } from "typeorm"
 config()
 
 export const databaseOptions: DataSourceOptions = {
-  port: Number(process.env.DATABASE_PORT) || 3306,
+  url: process.env.DATABASE_URL!,
+  port: Number(process.env.DATABASE_PORT) || 5432,
   host: process.env.DATABASE_HOST,
-  type: process.env.DATABASE_TYPE as "mysql",
+  type: process.env.DATABASE_TYPE as "postgres",
   username: process.env.DATABASE_USER,
   password: process.env.DATABASE_PASSWORD,
   database: process.env.DATABASE_NAME,
